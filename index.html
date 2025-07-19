@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>SzóNyomozó</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-gradient-start: #3d405b; --bg-gradient-end: #2c2f48; --container-bg: rgba(244, 241, 222, 0.95);
+            --text-color: #3d405b; --title-color: #e07a5f; --border-color-idle: #bcaaa4;
+            --border-color-active: #8d6e63; --correct-color: #81b29a; --present-color: #f2cc8f;
+            --absent-color: #9e9e9e; --key-bg: #dcd3b8; --key-text: #3d405b;
+            --key-shadow: 0 3px 0 #bcaaa4; --font-title: 'Fredoka One', cursive; --font-main: 'Roboto Mono', monospace;
+            --difficulty-easy: #388e3c; --difficulty-hard: #f57c00; --difficulty-extra: #d32f2f;
+            --fail-color: #e53935; --insurance-color: #4CAF50; --surprise-color: #9c27b0;
+        }
+
+        .theme-forest { --bg-gradient-start: #2d6a4f; --bg-gradient-end: #1b4332; --container-bg: rgba(247, 246, 242, 0.95); --text-color: #081c15; --title-color: #74c69d; --border-color-idle: #b7e4c7; --border-color-active: #95d5b2; --correct-color: #52b788; --present-color: #ffd60a; --absent-color: #9e9e9e; --key-bg: #d8f3dc; --key-text: #1b4332; --key-shadow: 0 3px 0 #b7e4c7; }
+        .theme-ocean { --bg-gradient-start: #0077b6; --bg-gradient-end: #023e8a; --container-bg: rgba(237, 246, 249, 0.95); --text-color: #03045e; --title-color: #00b4d8; --border-color-idle: #ade8f4; --border-color-active: #90e0ef; --correct-color: #48cae4; --present-color: #ffc300; --absent-color: #adb5bd; --key-bg: #caf0f8; --key-text: #023e8a; --key-shadow: 0 3px 0 #ade8f4; }
+        .theme-sunset { --bg-gradient-start: #f77f00; --bg-gradient-end: #d62828; --container-bg: rgba(255, 250, 240, 0.95); --text-color: #800f2f; --title-color: #fcbf49; --border-color-idle: #eae2b7; --border-color-active: #f77f00; --correct-color: #70e000; --present-color: #fcbf49; --absent-color: #bc6c25; --key-bg: #fff1e6; --key-text: #d62828; --key-shadow: 0 3px 0 #eae2b7; }
+        .theme-night { --bg-gradient-start: #232526; --bg-gradient-end: #000000; --container-bg: rgba(42, 42, 42, 0.95); --text-color: #e0e0e0; --title-color: #7f5af0; --border-color-idle: #6c757d; --border-color-active: #9a9a9a; --correct-color: #2cb67d; --present-color: #ffc107; --absent-color: #495057; --key-bg: #343a40; --key-text: #f8f9fa; --key-shadow: 0 3px 0 #495057; }
+        .theme-rose { --bg-gradient-start: #c9184a; --bg-gradient-end: #8c0f32; --container-bg: rgba(255, 240, 243, 0.95); --text-color: #590d22; --title-color: #ff758f; --border-color-idle: #ffb3c1; --border-color-active: #ff8fa3; --correct-color: #a9def9; --present-color: #fcf6bd; --absent-color: #c9ada7; --key-bg: #ffe5ec; --key-text: #8c0f32; --key-shadow: 0 3px 0 #ffb3c1; }
+        .theme-vintage { --bg-gradient-start: #a27b5c; --bg-gradient-end: #3f2f25; --container-bg: rgba(243, 235, 226, 0.95); --text-color: #3f2f25; --title-color: #7b553c; --border-color-idle: #dcd0c0; --border-color-active: #c0b2a4; --correct-color: #8c7a6b; --present-color: #e6b8a2; --absent-color: #9c8978; --key-bg: #efebe5; --key-text: #3f2f25; --key-shadow: 0 3px 0 #dcd0c0; }
+        .theme-meadow { --bg-gradient-start: #7cb518; --bg-gradient-end: #5c8001; --container-bg: rgba(248, 255, 242, 0.95); --text-color: #436129; --title-color: #aacc00; --border-color-idle: #d4e09b; --border-color-active: #b5c77e; --correct-color: #9ef01a; --present-color: #f7d622; --absent-color: #90a955; --key-bg: #f2f7e5; --key-text: #436129; --key-shadow: 0 3px 0 #d4e09b; }
+        .theme-royal { --bg-gradient-start: #5a189a; --bg-gradient-end: #3c096c; --container-bg: rgba(243, 237, 247, 0.95); --text-color: #3c096c; --title-color: #9d4edd; --border-color-idle: #d8b4fe; --border-color-active: #c792fe; --correct-color: #7b2cbf; --present-color: #fca311; --absent-color: #b1a7a6; --key-bg: #e9d8fd; --key-text: #3c096c; --key-shadow: 0 3px 0 #d8b4fe; }
+        .theme-hacker { --bg-gradient-start: #0c0c0c; --bg-gradient-end: #000000; --container-bg: rgba(10, 25, 10, 0.9); --text-color: #00ff00; --title-color: #00ff00; --border-color-idle: #008000; --border-color-active: #32cd32; --correct-color: #32cd32; --present-color: #adff2f; --absent-color: #556b2f; --key-bg: #111; --key-text: #00ff00; --key-shadow: 0 3px 0 #008000; font-family: 'Roboto Mono', monospace; }
+
+        body {
+            background-color: var(--bg-gradient-end);
+            background-image: radial-gradient(circle at top left, rgba(255, 255, 255, 0.1) 0%, transparent 40%), url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            color: var(--text-color);
+            font-family: var(--font-main);
+            display: flex; justify-content: center; align-items: flex-start; padding: 15px; box-sizing: border-box;
+            touch-action: manipulation;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        #game-container {
+            background-color: var(--container-bg);
+            border-radius: 20px; border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 600px;
+            padding: clamp(15px, 4vw, 30px); box-sizing: border-box; margin-top: 1vh; position: relative;
+            transition: background-color 0.3s ease;
+        }
+        #new-hour-notification {
+            display: none; justify-content: space-around; align-items: center;
+            position: sticky; top: -15px; left: -15px; right: -15px;
+            width: calc(100% + 30px);
+            background-color: var(--present-color); color: var(--text-color);
+            padding: 10px; font-weight: bold; z-index: 50;
+            border-bottom: 2px solid rgba(0,0,0,0.2);
+            border-radius: 20px 20px 0 0; margin: -15px -15px 15px -15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        #new-hour-notification button {
+            background-color: var(--text-color); color: var(--container-bg);
+            border: none; border-radius: 5px; padding: 5px 10px;
+            font-weight: bold; cursor: pointer;
+        }
+
+        header { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; margin-bottom: 20px; position: relative; width: 100%; }
+        #header-main { display: flex; align-items: center; justify-content: center; position: relative; }
+        #logo-container { display: flex; align-items: center; position: relative; }
+        #logo-svg { width: clamp(80px, 20vw, 100px); height: auto; z-index: 1; }
+        #logo-svg .logo-circle { stroke: url(#grad1); fill: var(--container-bg); transition: fill 0.3s ease; }
+        #logo-svg .logo-handle { stroke: url(#grad1); }
+        #logo-svg .logo-text { fill: var(--text-color); transition: fill 0.3s ease; }
+        #logo-svg stop { transition: stop-color 0.3s ease; }
+        
+        header h1 {
+            font-family: var(--font-title); color: var(--title-color); font-size: clamp(2rem, 9vw, 3rem); margin: 0;
+            letter-spacing: 0.05em; margin-left: -2px; z-index: 0; transition: color 0.3s ease;
+        }
+        #title-container { position: relative; display: flex; align-items: center; }
+        #copyright-notice { font-size: 0.7rem; color: var(--text-color); opacity: 0.7; margin-top: 2px; transition: color 0.3s ease, opacity 0.3s ease; }
+
+        #theme-toggle-button { width: 28px; height: 28px; cursor: pointer; z-index: 10; transition: transform 0.2s ease; margin-left: 10px; }
+        #theme-toggle-button:hover { transform: scale(1.2) rotate(15deg); }
+        #theme-toggle-button svg { fill: var(--title-color); transition: fill 0.3s ease; width: 100%; height: 100%; }
+        #theme-picker {
+            position: absolute; top: 100%; right: 0; margin-top: 10px; background-color: var(--container-bg);
+            border: 2px solid var(--border-color-idle); border-radius: 10px; padding: 10px; display: flex;
+            flex-wrap: wrap; gap: 8px; width: 150px; z-index: 20; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .theme-swatch { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid var(--border-color-idle); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .theme-swatch:hover { transform: scale(1.1); box-shadow: 0 0 5px var(--title-color); }
+        .theme-swatch.active { border: 3px solid var(--title-color); box-shadow: 0 0 8px var(--title-color); }
+        
+        #weekly-score-display { font-family: var(--font-main); font-size: 1.1rem; font-weight: 700; color: var(--title-color); background: rgba(0,0,0,0.05); padding: 5px 15px; border-radius: 20px; border: 2px solid var(--border-color-idle); margin-top: 10px; transition: color 0.3s ease, border-color 0.3s ease; }
+        #insurance-display {
+            display: flex; align-items: center; gap: 8px; font-family: var(--font-main);
+            font-size: 1.1rem; font-weight: 700; color: var(--insurance-color);
+            background: rgba(76, 175, 80, 0.1); padding: 5px 15px;
+            border-radius: 20px; border: 2px solid var(--insurance-color); margin-top: 5px;
+        }
+        #insurance-display svg { width: 20px; height: 20px; fill: currentColor; }
+
+        #bonus-activation-container, #active-bonus-display {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 10px;
+            background-color: rgba(0,0,0,0.05);
+            border: 2px solid var(--border-color-idle);
+        }
+        #bonus-activation-container h4, #active-bonus-display h4 {
+            margin: 0 0 10px 0;
+            font-family: var(--font-title);
+            color: var(--title-color);
+        }
+        .bonus-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            background-color: rgba(255,255,255,0.2);
+            border-radius: 8px;
+            margin-bottom: 5px;
+        }
+        .bonus-item button {
+            background-color: var(--correct-color);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .bonus-timer { font-weight: bold; color: var(--fail-color); }
+
+        #keyboard-toggle-container { margin-top: 10px; font-size: 0.8rem; font-weight: bold; display: flex; align-items: center; gap: 5px; color: var(--text-color); }
+        #keyboard-toggle-checkbox { cursor: pointer; }
+
+        #word-tracker { display: flex; justify-content: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+        .tracker-item { flex: 1; min-width: 60px; padding: 10px 5px; text-align: center; border-radius: 8px; border: 2px solid var(--border-color-idle); font-weight: 500; cursor: pointer; transition: all 0.3s ease; position: relative; }
+        .tracker-item.active { border-color: var(--title-color); box-shadow: 0 0 8px var(--title-color); }
+        .tracker-item.solved { background-color: var(--correct-color); border-color: var(--correct-color); color: white; cursor: not-allowed;}
+        .tracker-item.failed { background-color: var(--fail-color); border-color: var(--fail-color); color: white; }
+        .tracker-item.failed-revealed { background-color: var(--fail-color); border-color: var(--fail-color); color: white; cursor: not-allowed; opacity: 0.6; }
+        .tracker-item .cooldown-timer { font-size: 0.8em; font-weight: bold; margin-top: 4px; }
+        
+        #info-bar { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 12px 0; min-height: 50px; margin-bottom: 5px; }
+        #info-bar.feedback-message { justify-content: center; font-size: 1.2rem; font-weight: bold; }
+        #info-bar.feedback-message strong { color: var(--title-color); }
+        
+        #reveal-solution-container { margin-left: auto; }
+        #reveal-solution-button { background-color: var(--fail-color); color: white; border: none; padding: 8px 12px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+
+        .mode-choice-button { background-color: var(--key-bg); color: var(--key-text); border: 2px solid var(--border-color-idle); padding: 8px 12px; border-radius: 8px; font-weight: 700; cursor: pointer; margin: 0 5px; }
+        #game-mode-display { display: flex; align-items: center; background-color: rgba(0,0,0,0.05); padding: 5px 10px; border-radius: 20px; }
+        #game-mode-display span { font-weight: 700; font-size: 0.9rem; }
+        #timer-display { font-weight: 700; font-size: 1.1em; color: var(--title-color); margin-left: 8px; }
+        
+        #word-info-container { display: flex; flex-direction: column; align-items: flex-start; text-align: left; }
+        #difficulty-display { font-weight: 700; margin-top: 4px; border-radius: 10px; padding: 3px 10px; color: white; font-size: 0.9em; text-transform: uppercase; letter-spacing: 0.5px; text-shadow: 1px 1px 2px rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.3); }
+        .difficulty-könnyű { background-color: var(--difficulty-easy); } .difficulty-nehéz { background-color: var(--difficulty-hard); } .difficulty-extra-nehéz { background-color: var(--difficulty-extra); }
+        
+        #hint-display-area { display: none; width: 100%; padding: 15px; margin-bottom: 15px; background-color: rgba(0,0,0,0.05); border: 2px solid var(--border-color-idle); border-radius: 10px; text-align: center; line-height: 1.6; opacity: 0; transition: opacity 0.5s ease; }
+        #hint-display-area.active { display: block; opacity: 1; }
+        #hint-display-area strong { color: var(--title-color); font-style: normal; }
+        
+        #grid-container { display: grid; grid-template-rows: repeat(6, 1fr); gap: 5px; width: 100%; max-width: 500px; margin: 0 auto 20px auto; aspect-ratio: 5 / 6; }
+        .grid-row { display: grid; gap: 5px; }
+        .grid-cell { perspective: 1000px; }
+        .cell-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; }
+        .grid-cell.flip .cell-inner { transform: rotateX(180deg); }
+        .cell-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; justify-content: center; align-items: center; font-size: clamp(1.5rem, 5vw, 2.2rem); font-weight: bold; text-transform: uppercase; box-sizing: border-box; border-radius: 8px; }
+        .cell-front { border: 3px solid var(--border-color-idle); transition: border-color 0.2s ease; }
+        .grid-cell.filled .cell-front:not(.cell-revealed) { border-color: var(--border-color-active); animation: pop 0.2s; }
+        @keyframes pop { 50% { transform: scale(1.1); } }
+        .cell-revealed { border-color: var(--correct-color); background-color: rgba(129, 178, 154, 0.2); }
+        .cell-back { color: white; transform: rotateX(180deg); border: 3px solid transparent; }
+        .cell-back.correct { background-color: var(--correct-color); border-color: var(--correct-color);} .cell-back.present { background-color: var(--present-color); border-color: var(--present-color);} .cell-back.absent  { background-color: var(--absent-color); border-color: var(--absent-color);}
+        
+        #hint-controls { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; width: 100%; }
+        .hint-button { color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: 700; transition: all 0.2s; font-size: 0.9rem; flex-grow: 1; max-width: 250px; }
+        .hint-button#request-text-hint-button { background-color: var(--present-color); box-shadow: 0 3px 0 #d0a457; }
+        .hint-button#request-letter-hint-button { background-color: var(--correct-color); box-shadow: 0 3px 0 #6a9982; }
+        .hint-button:hover:not(:disabled) { transform: translateY(-2px); }
+        .hint-button:disabled { background-color: var(--absent-color); cursor: not-allowed; box-shadow: none; opacity: 0.7; }
+        
+        #keyboard-container { display: flex; flex-direction: column; gap: clamp(8px, 1.5vw, 12px); width: 100%; max-width: 900px; margin: 0 auto; }
+        .keyboard-row { display: flex; justify-content: center; gap: clamp(4px, 1vw, 8px); }
+        .key { font-family: var(--font-main); font-weight: 500; border: none; border-radius: 6px; height: clamp(50px, 13vw, 65px); flex-grow: 1; cursor: pointer; text-transform: uppercase; font-size: clamp(1rem, 3.5vw, 1.6rem); display: flex; justify-content: center; align-items: center; padding: 0; background-color: var(--key-bg); color: var(--key-text); box-shadow: var(--key-shadow); transition: all 0.1s ease-in-out, background-color 0.3s ease, color 0.3s ease; }
+        .key:active, .key.active-press { transform: translateY(2px); box-shadow: none; }
+        .key.large { flex-grow: 1.5; font-size: clamp(0.8rem, 2.8vw, 1.2rem); }
+        .key.correct, .key.correct:hover { background-color: var(--correct-color); color: white; } .key.present, .key.present:hover { background-color: var(--present-color); color: white; } .key.absent, .key.absent:hover { background-color: var(--absent-color); color: white; opacity: 0.7; }
+        #keyboard-container.disabled .key { cursor: not-allowed; opacity: 0.6; }
+
+        #idle-message-container { text-align: center; padding: 40px 20px; line-height: 1.8; border: 2px dashed var(--border-color-idle); border-radius: 15px; margin: 20px 0; }
+        #idle-message-container h3 { font-family: var(--font-title); color: var(--title-color); font-size: 1.6rem; margin: 0 0 15px 0; }
+        #idle-message-container p { margin: 10px 0; font-size: 1.1rem; }
+        #countdown-timer { font-weight: bold; color: var(--title-color); font-size: 1.2rem; display: block; margin-top: 15px; }
+
+        #rules-button {
+            margin-top: 30px;
+            padding: 12px 25px;
+            font-family: var(--font-title);
+            font-size: 1.2rem;
+            color: white;
+            background-color: var(--title-color);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        #rules-button:hover { transform: scale(1.05); }
+        
+        #bonus-unlock-container {
+            display: flex; flex-direction: column; align-items: center; gap: 15px; margin: 20px 0;
+            padding: 20px; border: 2px dashed var(--border-color-idle); border-radius: 15px; width: 100%;
+        }
+        #bonus-unlock-header { display: flex; align-items: center; gap: 15px; }
+        #wheel-logo-svg { width: 60px; height: 60px; }
+        #bonus-unlock-header h2 { font-family: var(--font-title); color: var(--title-color); font-size: 1.8rem; margin: 0; }
+        #code-input-container { display: flex; gap: 10px; }
+        .code-input {
+            width: 45px; height: 60px; border-radius: 8px; border: 3px solid var(--border-color-idle);
+            text-align: center; font-family: var(--font-main); font-size: 2rem; font-weight: bold; color: var(--text-color);
+            background-color: var(--container-bg); -moz-appearance: textfield; transition: all 0.2s ease;
+        }
+        .code-input.flashing-code {
+            background-color: var(--title-color); color: white;
+            border-color: var(--title-color);
+            animation: code-flash-pulse 0.5s infinite alternate;
+        }
+        @keyframes code-flash-pulse { from { transform: scale(1); } to { transform: scale(1.05); } }
+        .code-input::-webkit-outer-spin-button, .code-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .code-input:focus { border-color: var(--title-color); outline: none; }
+        #code-input-container.shake { animation: shake 0.5s; }
+        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+        #check-code-button {
+            background-color: var(--correct-color); color: white; border: none; padding: 10px 20px;
+            border-radius: 8px; font-weight: 700; cursor: pointer; transition: transform 0.2s;
+        }
+        #check-code-button:hover { transform: scale(1.05); }
+
+        #play-wheel-button {
+            display: none; background-color: var(--difficulty-extra); color: white; border: 2px solid white;
+            border-radius: 10px; padding: 15px 30px; font-family: var(--font-title); font-size: 1.2rem;
+            letter-spacing: 1px; margin: 20px 0; text-shadow: 1px 1px 3px rgba(0,0,0,0.4); cursor: pointer;
+            animation: pulse-red 2s infinite;
+        }
+        @keyframes pulse-red { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(211, 47, 47, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(211, 47, 47, 0); } }
+        
+        /* Lottó Szekció Stílusai */
+        .lotto-section {
+            display: flex; flex-direction: column; align-items: center; gap: 15px; margin: 10px 0;
+            padding: 20px; border: 2px solid var(--border-color-active); border-radius: 15px; width: 100%;
+            background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0));
+        }
+        .lotto-header { display: flex; align-items: center; gap: 15px; cursor: pointer; }
+        .lotto-logo-svg { width: 60px; height: 60px; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2)); }
+        .lotto-header h2 { font-family: var(--font-title); color: var(--title-color); font-size: 1.8rem; margin: 0; }
+        .lotto-section p { font-size: 0.9rem; text-align: center; line-height: 1.5; max-width: 90%; margin: 5px 0; }
+        .lotto-prizes-list {
+            list-style-type: '🏆';
+            padding-left: 20px;
+            text-align: left;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            width: 100%;
+        }
+        .lotto-prizes-list strong { color: var(--title-color); font-style: normal; }
+        #play-lotto-button, #play-weekly-lotto-button { max-width: 350px; }
+        .lotto-played-message { color: var(--fail-color); font-weight: bold; margin-top: 10px; min-height: 1.2em; transition: opacity 0.3s; }
+        .lotto-suspension-message { font-weight: bold; color: var(--fail-color); display: none; }
+
+        .lotto-ticket-stub {
+            background-color: rgba(255, 255, 255, 0.4);
+            border: 2px dashed var(--border-color-active);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 10px;
+            width: 95%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .winning-numbers-container {
+            display: none;
+            background-color: rgba(0,0,0,0.02);
+            border: 1px solid var(--border-color-idle);
+            padding: 10px 15px;
+            box-shadow: none;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .winning-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        .winning-header .lotto-logo-svg {
+            width: 35px;
+            height: 35px;
+        }
+        .winning-header h4 {
+            margin: 0;
+            font-family: var(--font-main);
+            color: var(--text-color);
+            font-size: 1rem;
+            font-weight: 700;
+        }
+        .lotto-ticket-stub h4 { margin: 0 0 10px 0; font-family: var(--font-title); color: var(--text-color); }
+        .submitted-tickets-container { display: flex; flex-direction: column; gap: 10px; width: 100%; align-items: center; }
+        .number-display { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+        .lotto-ball {
+            width: 35px; height: 35px; border-radius: 50%; background-color: var(--key-bg);
+            color: var(--key-text); border: 2px solid var(--border-color-idle);
+            display: flex; justify-content: center; align-items: center; font-weight: bold;
+            box-shadow: inset 1px 1px 3px rgba(0,0,0,0.1), 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        .lotto-ball.match { background-color: var(--correct-color); color: white; border-color: #6a9982; animation: pop 0.5s; }
+
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s 0.3s; }
+        .overlay.visible { opacity: 1; visibility: visible; transition-delay: 0s; }
+        .overlay-content { background-color: var(--container-bg); color: var(--text-color); transition: background-color 0.3s ease, color 0.3s ease; padding: clamp(20px, 4vw, 30px); border-radius: 20px; text-align: center; box-shadow: 0 5px 25px rgba(0,0,0,0.3); max-width: 95vw; width: auto; max-height: 95vh; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .overlay-content h2 { font-family: var(--font-title); color: var(--title-color); margin: 0 0 10px 0; font-size: clamp(1.5rem, 6vw, 2.2rem); }
+        .overlay-button { background-color: var(--title-color); color: white; border: none; padding: 12px 25px; border-radius: 8px; font-family: var(--font-main); font-weight: 700; font-size: 1rem; cursor: pointer; margin-top: 15px; transition: transform 0.2s ease, background-color 0.3s ease; }
+        
+        #lotto-game-container, #prize-choice-container, #hour-choice-container { display: flex; flex-direction: column; align-items: center; }
+        #lotto-grid-overlay { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; max-width: 360px; width: 100%; margin: 15px 0; }
+        .lotto-number { width: 40px; height: 40px; border-radius: 50%; background-color: var(--key-bg); color: var(--key-text); border: 2px solid var(--border-color-idle); display: flex; justify-content: center; align-items: center; font-weight: bold; cursor: pointer; transition: all 0.2s ease; }
+        .lotto-number:hover { transform: scale(1.1); background-color: var(--present-color); }
+        .lotto-number.selected { background-color: var(--title-color); color: white; border-color: var(--title-color); transform: scale(1.1); box-shadow: 0 0 8px var(--title-color); }
+        #lotto-selection-counter { font-weight: bold; color: var(--text-color); }
+        #lotto-overlay-buttons { display: flex; gap: 10px; justify-content: center; width: 100%;}
+        #submit-lotto-button-overlay { background-color: var(--correct-color); box-shadow: 0 3px 0 #388e3c; flex-grow: 2; }
+        #close-lotto-overlay-button { background-color: var(--fail-color); box-shadow: 0 3px 0 #b71c1c; flex-grow: 1; }
+        #lotto-overlay-message { min-height: 2em; transition: opacity 0.5s ease; }
+        #lotto-overlay-message .star-icon { font-size: 2rem; color: var(--present-color); display: block; margin-top: 10px; text-shadow: 0 0 5px #000; }
+        #prize-choice-options { display: flex; flex-direction: column; gap: 15px; margin-top: 10px; }
+        .prize-option-button { background-color: var(--key-bg); color: var(--key-text); border: 2px solid var(--border-color-active); padding: 15px; border-radius: 10px; cursor: pointer; transition: all 0.2s ease; text-align: left;}
+        .prize-option-button:hover { background-color: var(--present-color); border-color: var(--title-color); }
+        .prize-option-button .prize-title { font-weight: bold; font-size: 1.1rem; color: var(--title-color); }
+        .prize-option-button .prize-desc { font-size: 0.9rem; margin-top: 5px; }
+
+        #hour-choice-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin: 15px 0; }
+        .hour-choice-button { width: 45px; height: 45px; border: 2px solid var(--border-color-idle); border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .hour-choice-button.selected { background-color: var(--correct-color); color: white; border-color: var(--correct-color); }
+        .hour-choice-button.unavailable { background-color: var(--absent-color); cursor: not-allowed; opacity: 0.6; }
+
+
+        /* Szerencsekerék */
+        #wheel-game-container { display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        #wheel-wrapper { position: relative; width: 360px; height: 360px; margin: 10px auto; }
+        #wheel-pointer { width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 40px solid var(--fail-color); position: absolute; top: -15px; left: 50%; transform: translateX(-50%); z-index: 10; transition: border-top-color 0.3s ease; }
+        #wheel { width: 100%; height: 100%; transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1); }
+        #wheel-game-ui { display: flex; flex-direction: column; align-items: center; gap: 15px; width: 100%; }
+        #wheel-round-display { font-size: 1.2rem; font-weight: bold; color: var(--title-color); }
+        #wheel-stats-container { font-size: 1.1rem; font-weight: bold; background: rgba(0,0,0,0.05); padding: 8px 15px; border-radius: 10px; border: 2px solid var(--border-color-idle); }
+        #wheel-insurance-display {
+            display: flex; align-items: center; gap: 8px; color: var(--insurance-color); 
+            font-size: 1rem; margin-top: 5px; justify-content: center;
+        }
+        #wheel-insurance-display svg { width: 18px; height: 18px; fill: currentColor; }
+        #wheel-winnings-display { color: var(--difficulty-easy); }
+        #puzzle-category { font-size: 1rem; font-weight: bold; background: var(--title-color); color: white; padding: 5px 15px; border-radius: 10px; }
+        #puzzle-board { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; max-width: 100%; padding: 10px; align-items: center; }
+        .puzzle-tile { width: 32px; height: 42px; border-radius: 5px; perspective: 1000px; flex-shrink: 0; }
+        .puzzle-tile:not(.space) { border: 2px solid #fff; }
+        .puzzle-tile.space { background-color: transparent; border: none; width: 15px; }
+        .tile-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; }
+        .puzzle-tile:not(.space) .tile-inner { background-color: var(--correct-color); }
+        .puzzle-tile.revealed .tile-inner { transform: rotateY(180deg); }
+        .tile-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; justify-content: center; align-items: center; }
+        .tile-front { background-color: var(--correct-color); }
+        .tile-back { background-color: #fff; color: var(--text-color); font-weight: bold; font-size: 1.5rem; transform: rotateY(180deg); }
+        #wheel-message-display { min-height: 2.5em; font-size: 1.1rem; font-weight: bold; color: var(--title-color); text-align: center; transition: opacity 0.3s ease; }
+        #wheel-alphabet-panel { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; max-width: 95%; margin: 10px 0; }
+        .alphabet-key { width: 30px; height: 30px; border: 2px solid var(--border-color-idle); border-radius: 5px; background-color: var(--key-bg); color: var(--key-text); font-weight: bold; cursor: pointer; transition: all 0.2s; }
+        .alphabet-key.guessed { background-color: var(--absent-color); color: white; opacity: 0.6; cursor: not-allowed; }
+        .alphabet-key.vowel { border-color: var(--present-color); }
+        #wheel-controls, #wheel-decision-controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+        #wheel-controls button, #wheel-decision-controls button, #wheel-help-button { padding: 10px 15px; font-size: 1rem; }
+        #spin-button { background-color: var(--difficulty-easy); box-shadow: 0 3px 0 #2e7d32; }
+        #solve-button { background-color: var(--difficulty-hard); box-shadow: 0 3px 0 #c46400; }
+        #wheel-help-button { background-color: #9c27b0; color: white; box-shadow: 0 3px 0 #7b1fa2; }
+        #wheel-help-button.pulse-purple { animation: pulse-purple 1.5s infinite; }
+        @keyframes pulse-purple { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(156, 39, 176, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(156, 39, 176, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(156, 39, 176, 0); } }
+        #cash-out-button { background-color: var(--difficulty-easy); box-shadow: 0 3px 0 #2e7d32; }
+        #next-round-button { background-color: var(--difficulty-hard); box-shadow: 0 3px 0 #c46400; }
+        #power-meter-container { width: 80%; max-width: 400px; height: 20px; background-color: #ccc; border-radius: 10px; overflow: hidden; margin-top: 10px; cursor: pointer; border: 2px solid var(--text-color); }
+        #power-meter-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #f2cc8f, #e07a5f, var(--fail-color)); }
+        .power-up { animation: power-up 1.5s linear infinite; }
+        @keyframes power-up { 0% { width: 0%; } 50% { width: 100%; } 100% { width: 0%; } }
+
+        /* 20 Kártya Játék */
+        #card-game-container { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        #card-board { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; width: 100%; max-width: 520px; perspective: 1000px; }
+        .game-card { width: 90px; height: 130px; cursor: pointer; position: relative; }
+        .game-card.disabled { cursor: not-allowed; }
+        .card-inner { position: absolute; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; }
+        .game-card.flipped .card-inner { transform: rotateY(180deg); }
+        .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        .card-face-front { background-color: var(--key-bg); display: flex; justify-content: center; align-items: center; padding: 5px; box-sizing: border-box; border: 2px solid var(--border-color-active); }
+        .card-logo-svg { width: 90%; height: auto; }
+        .card-logo-svg .logo-circle { stroke: url(#grad1); fill: var(--container-bg); }
+        .card-logo-svg .logo-handle { stroke: url(#grad1); }
+        .card-logo-svg .logo-text { fill: var(--text-color); }
+        .card-face-back { background-color: #fff; color: var(--text-color); transform: rotateY(180deg); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 10px; font-weight: bold; border: 2px solid var(--border-color-active); }
+        .card-face-back.total-bankrupt, .card-face-back.cursed { background-color: var(--fail-color); color: white; border-color: var(--fail-color); }
+        .card-face-back.joker { background: linear-gradient(45deg, var(--present-color), var(--correct-color)); color: white; }
+        .card-face-back.special-prize { background: radial-gradient(circle, var(--surprise-color), var(--title-color)); color: white; border-color: var(--surprise-color); }
+        .card-face-back .card-title { font-size: 1.1rem; margin-bottom: 5px; }
+        .card-face-back .card-desc { font-size: 0.8rem; }
+        #card-prizes-list { list-style-type: '🃏'; text-align: left; padding-left: 20px; font-size: 0.9rem; line-height: 1.6; }
+
+    </style>
+</head>
+<body class="theme-classic">
+    <div id="game-container">
+        <div id="new-hour-notification">
+            <span>Új feladványok elérhetők!</span>
+            <button id="new-hour-refresh-button">Frissítés</button>
+        </div>
+        <input type="text" id="hidden-input" style="position: absolute; left: -9999px; opacity: 0; width: 1px; height: 1px;" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <header>
+            <div id="header-main">
+                <div id="logo-container">
+                    <svg id="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop class="grad-stop1" offset="0%" style="stop-color: var(--title-color);stop-opacity:1" />
+                                <stop class="grad-stop2" offset="100%" style="stop-color: var(--text-color);stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <circle class="logo-circle" cx="50" cy="50" r="40" stroke-width="12"/>
+                        <line class="logo-handle" x1="32" y1="72" x2="5" y2="95" stroke-width="16" stroke-linecap="round"/>
+                        <text class="logo-text" x="50" y="62" font-family="Fredoka One, cursive" font-size="38" text-anchor="middle">Szó</text>
+                    </svg>
+                </div>
+                <div style="text-align: center; position: relative;">
+                    <div id="title-container">
+                        <h1>Nyomozó</h1>
+                        <div id="theme-toggle-button" title="Színtéma választása">
+                            <svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg>
+                        </div>
+                    </div>
+                    <div id="copyright-notice">© by Robi</div>
+                    <div id="theme-picker" style="display: none;"></div>
+                </div>
+            </div>
+            <div id="weekly-score-display">Heti pontszám: <span>0</span></div>
+            <div id="insurance-display" title="Biztosítások">
+                <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"></path></svg>
+                <span id="insurance-display-count">0</span>
+            </div>
+            <div id="bonus-activation-container"></div>
+            <div id="active-bonus-display"></div>
+             <div id="keyboard-toggle-container">
+                <label for="keyboard-toggle-checkbox">Eszköz billentyűzet használata: </label>
+                <input type="checkbox" id="keyboard-toggle-checkbox" title="Ha bepipálod, a játék billentyűzete eltűnik, és a sajátodat használhatod.">
+            </div>
+        </header>
+        
+        <div id="daily-winning-numbers-display" class="winning-numbers-container"></div>
+        <div id="weekly-winning-numbers-display" class="winning-numbers-container"></div>
+
+        <div id="word-tracker"></div>
+
+        <div id="bonus-unlock-container" style="display: none;">
+            <div id="bonus-unlock-header">
+                 <svg id="wheel-logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="45" fill="var(--key-bg)" stroke="var(--title-color)" stroke-width="8"/>
+                    <path d="M50 5 L50 95 M5 50 L95 50 M20 20 L80 80 M20 80 L80 20" stroke="rgba(0,0,0,0.1)" stroke-width="6"/>
+                    <circle cx="50" cy="50" r="15" fill="var(--title-color)"/>
+                    <text x="50" y="58" text-anchor="middle" font-size="20" fill="white" font-weight="bold">★</text>
+                </svg>
+                <h2>Szerencsekerék</h2>
+            </div>
+            <p>Gyűjtsd össze a játék közben felvillanó 4 jegyű kódot a feloldáshoz!</p>
+            <div id="code-input-container">
+                <input type="number" class="code-input" maxlength="1" data-index="0">
+                <input type="number" class="code-input" maxlength="1" data-index="1">
+                <input type="number" class="code-input" maxlength="1" data-index="2">
+                <input type="number" class="code-input" maxlength="1" data-index="3">
+            </div>
+            <button id="check-code-button">Kód beváltása</button>
+        </div>
+        <button id="play-wheel-button">🏆 Szerencsekerék Játék 🏆</button>
+        
+        <div id="info-bar">
+        </div>
+
+        <main id="grid-container"></main>
+        
+        <div id="hint-display-area"></div>
+        
+        <div id="hint-controls">
+            <button id="request-text-hint-button" class="hint-button">Szöveges segítség</button>
+            <button id="request-letter-hint-button" class="hint-button">Betű felfedése</button>
+        </div>
+        
+        <div id="keyboard-container"></div>
+
+        <div id="idle-message-container" style="display: none;"></div>
+        
+        <div id="lotto-container" class="lotto-section">
+            <div class="lotto-header">
+                <svg class="lotto-logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                   <path d="M50 2 L61.8 38.2 L98 38.2 L68.1 61.8 L79.9 98 L50 75 L20.1 98 L31.9 61.8 L2 38.2 L38.2 38.2 Z" fill="var(--present-color)" stroke="var(--title-color)" stroke-width="3"/>
+                </svg>
+                <h2>Napi Lottó</h2>
+            </div>
+            <p>Az első szelvény ingyenes, további 4 vásárolható 5000 pontért. Sorsolás minden nap 19:00-kor.</p>
+             <ul class="lotto-prizes-list">
+                <li><strong>5 találat:</strong> Aktiválható 24 órás korlátlanság + 50,000 pont</li>
+                <li><strong>4 találat:</strong> Aktiválható 3 órás ingyenes Szerencsekerék</li>
+                <li><strong>3 találat:</strong> Aktiválható 1 órás ingyenes segítség</li>
+                <li><strong>2 találat:</strong> +2 vásárolható biztosítás a keréken (aznapra)</li>
+                <li><strong>1 találat:</strong> +1 ingyenes szöveges segítség</li>
+            </ul>
+            <p class="lotto-suspension-message">A fogadás 19:00 és 23:59 (UTC) között szünetel!</p>
+            <button id="play-lotto-button" class="hint-button">Első ingyenes szelvény</button>
+            <div class="lotto-played-message"></div>
+            <div class="submitted-tickets-container"></div>
+        </div>
+
+        <div id="weekly-lotto-container" class="lotto-section">
+            <div class="lotto-header">
+                <svg class="lotto-logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M85,30 A35,35 0 1,0 15,30 L50,95 Z" fill="var(--surprise-color)" stroke="var(--title-color)" stroke-width="3"/>
+                    <path d="M50,15 L50,30" stroke="white" stroke-width="4" stroke-linecap="round"/>
+                     <path d="M35,22 L40,32" stroke="white" stroke-width="4" stroke-linecap="round"/>
+                     <path d="M65,22 L60,32" stroke="white" stroke-width="4" stroke-linecap="round"/>
+                </svg>
+                <h2>Heti Lottó</h2>
+            </div>
+            <p>A hét extrája! Vásárolj akár 4 szelvényt a hét folyamán <strong>100,000 pontért</strong>. Sorsolás vasárnap 19:00-kor!</p>
+            <ul class="lotto-prizes-list">
+                <li><strong>5 találat:</strong> 100,000,000 pont + a köv. heti összes napi lottó nyeremény!</li>
+                <li><strong>4 találat:</strong> 25,000,000 pont + Örök bónusz (+1 bizt./hét)</li>
+                <li><strong>3 találat:</strong> 5,000,000 pont + Heti Joker (köv. héten minden féláron)</li>
+                <li><strong>2 találat:</strong> 1,000,000 pont + 10 Biztosítás</li>
+                <li><strong>1 találat:</strong> 200,000 pont</li>
+            </ul>
+            <p class="lotto-suspension-message">A fogadás 19:00 és 23:59 (UTC) között szünetel!</p>
+            <button id="play-weekly-lotto-button" class="hint-button" style="background-color: var(--surprise-color);">Szelvény vásárlása</button>
+            <div class="lotto-played-message"></div>
+            <div class="submitted-tickets-container"></div>
+        </div>
+
+        <button id="rules-button">Játékszabályok Megnyitása</button>
+
+    </div>
+
+    <!-- Overlays -->
+    <div id="lotto-game-overlay" class="overlay">
+        <div class="overlay-content">
+            <div id="lotto-game-container">
+                 <div class="lotto-header">
+                    <svg id="lotto-logo-svg-overlay" class="lotto-logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M50 2 L61.8 38.2 L98 38.2 L68.1 61.8 L79.9 98 L50 75 L20.1 98 L31.9 61.8 L2 38.2 L38.2 38.2 Z" fill="var(--present-color)" stroke="var(--title-color)" stroke-width="3"/>
+                    </svg>
+                    <h2 id="lotto-overlay-title">Napi Lottó</h2>
+                </div>
+                <p>Válassz 5 számot az alábbi rácsból.</p>
+                <div id="lotto-grid-overlay"></div>
+                <p id="lotto-selection-counter">0 / 5 kiválasztva</p>
+                <div id="lotto-overlay-buttons">
+                    <button id="close-lotto-overlay-button" class="hint-button">Mégse</button>
+                    <button id="submit-lotto-button-overlay" class="hint-button">Szelvény feladása</button>
+                </div>
+                <div id="lotto-overlay-message"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="prize-choice-overlay" class="overlay">
+        <div class="overlay-content">
+            <div id="prize-choice-container">
+                <h2>Gratulálunk, több nyereményt is elértél!</h2>
+                <p>Válassz egyet az alábbiak közül, ami a következő sorsolási ciklus elejétől lesz aktív.</p>
+                <div id="prize-choice-options">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="hour-choice-overlay" class="overlay">
+        <div class="overlay-content">
+             <div id="hour-choice-container">
+                <h2 id="hour-choice-title">Válaszd ki az ingyenes órákat!</h2>
+                <p>Jelöld ki a nap 24 órájából azt a(z) <strong id="hours-to-select">X</strong> darabot, amikor a bónuszod aktív lesz. A kiválasztott órák a következő naptól érvényesek.</p>
+                <div id="hour-choice-grid"></div>
+                <p id="hour-selection-counter">0 / X kiválasztva</p>
+                <button id="confirm-hour-choice-button" class="overlay-button">Kiválasztott órák mentése</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="wheel-game-overlay" class="overlay">
+        <div class="overlay-content">
+            <div id="wheel-game-container">
+                <h2>Szerencsekerék</h2>
+                <div id="wheel-round-display"></div>
+                <div id="wheel-game-ui">
+                    <div id="wheel-stats-container">
+                        <div id="wheel-stake-display">Tét: <span id="stake-amount">0</span></div>
+                        <div id="wheel-winnings-display">Körös Nyeremény: <span id="player-score">0</span></div>
+                        <div id="wheel-insurance-display" title="Biztosítások">
+                            <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"></path></svg>
+                            <span id="wheel-insurance-count">0</span>
+                        </div>
+                    </div>
+                    <div id="puzzle-category"></div>
+                    <div id="puzzle-board"></div>
+                    <div id="wheel-alphabet-panel"></div>
+                    <div id="wheel-message-display"></div>
+                    <div id="wheel-wrapper">
+                        <div id="wheel-pointer"></div>
+                        <svg id="wheel" viewBox="0 0 100 100"></svg>
+                    </div>
+                    <div id="power-meter-container" title="Kattints a pörgetéshez, majd a megfelelő erősségnél újra a megállításhoz!">
+                        <div id="power-meter-bar"></div>
+                    </div>
+                    <div id="wheel-controls">
+                        <button id="spin-button" class="hint-button">Pörgetés</button>
+                        <button id="solve-button" class="hint-button" disabled>Megfejtem</button>
+                        <button id="wheel-help-button" class="hint-button" style="display: none;">Végső Segítség</button>
+                    </div>
+                     <div id="wheel-decision-controls" style="display: none;">
+                        <button id="cash-out-button" class="hint-button">Nyeremény felvétele</button>
+                        <button id="next-round-button" class="hint-button">Következő kör</button>
+                    </div>
+                </div>
+                <button id="close-wheel-button" class="overlay-button" style="display: none;">Bezárás</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="card-game-overlay" class="overlay">
+        <div class="overlay-content">
+            <div id="card-game-container">
+                <h2>Bónusz Játék: 20 Kártya</h2>
+                <p>Gratulálunk a 3. körhöz! Válassz egy kártyát a végső nyereményért!</p>
+                <div id="card-board"></div>
+                <div id="card-game-message" style="font-weight: bold; min-height: 1.5em;"></div>
+                <div>
+                    <h4>Lehetséges lapok:</h4>
+                    <ul id="card-prizes-list"></ul>
+                </div>
+                <button id="collect-winnings-button" class="overlay-button" style="display: none;">Nyeremény begyűjtése</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        
+        // --- ADATOK BETÖLTÉSE ---
+        let wordData = [];
+        let wheelPuzzles = [];
+        
+        try {
+            const wordResponse = await fetch('szavak.json');
+            if (!wordResponse.ok) throw new Error('A "szavak.json" betöltése sikertelen!');
+            wordData = await wordResponse.json();
+            
+            const wheelResponse = await fetch('szerencsekerek_feladvanyok.json');
+            if (!wheelResponse.ok) throw new Error('A "szerencsekerek_feladvanyok.json" betöltése sikertelen!');
+            wheelPuzzles = await wheelResponse.json();
+            
+            // Ha a betöltés sikeres, indítjuk a játékot
+            initializeGame();
+
+        } catch (error) {
+            console.error("Hiba a játékadatok betöltésekor:", error);
+            document.getElementById('game-container').innerHTML = `<h1>Hoppá!</h1><p>A játék elindításához szükséges fájlok nem töltődtek be. Kérlek, ellenőrizd, hogy az <code>index.html</code> mellett a <code>szavak.json</code> és a <code>szerencsekerek_feladvanyok.json</code> fájlok is a helyükön vannak-e, majd frissítsd az oldalt.</p><p>Hibaüzenet: ${error.message}</p>`;
+            return;
+        }
+
+
+        // --- GLOBÁLIS VÁLTOZÓK ÉS KONSTANSOK ---
+        const MAX_GUESSES = 6; let gameData = {}; let timerInterval; let cooldownIntervals = {}; let wheelMessageTimeout = null; let randomMessageInterval = null; let idleCountdownInterval = null; let secretCodeFlasherInterval = null;
+        let activeHints = { text: [], letterIndices: [], usedCount: 0 };
+        const RETRY_COOLDOWN_MS = 15 * 60 * 1000;
+        
+        const body = document.body;
+        const hiddenInput = document.getElementById('hidden-input');
+        const gridContainer = document.getElementById('grid-container'); const keyboardContainer = document.getElementById('keyboard-container'); const requestTextHintButton = document.getElementById('request-text-hint-button'); const requestLetterHintButton = document.getElementById('request-letter-hint-button'); const wordTrackerContainer = document.getElementById('word-tracker'); const weeklyScoreDisplaySpan = document.querySelector('#weekly-score-display span'); const insuranceDisplayCount = document.getElementById('insurance-display-count'); const newHourNotification = document.getElementById('new-hour-notification');
+        const bonusUnlockContainer = document.getElementById('bonus-unlock-container');
+        const codeInputContainer = document.getElementById('code-input-container');
+        const codeInputs = document.querySelectorAll('.code-input');
+        const checkCodeButton = document.getElementById('check-code-button');
+        const playWheelButton = document.getElementById('play-wheel-button');
+        const keyboardToggleCheckbox = document.getElementById('keyboard-toggle-checkbox');
+        const wheelGameOverlay = document.getElementById('wheel-game-overlay'); const closeWheelButton = document.getElementById('close-wheel-button'); const wheel = document.getElementById('wheel'); const spinButton = document.getElementById('spin-button'); const powerMeterBar = document.getElementById('power-meter-bar'); const powerMeterContainer = document.getElementById('power-meter-container'); const playerScoreEl = document.getElementById('player-score'); const stakeAmountEl = document.getElementById('stake-amount'); const puzzleBoardEl = document.getElementById('puzzle-board'); const puzzleCategoryEl = document.getElementById('puzzle-category'); const solveButton = document.getElementById('solve-button'); const wheelMessageDisplay = document.getElementById('wheel-message-display'); const wheelInsuranceCountEl = document.getElementById('wheel-insurance-count');
+        const wheelRoundDisplay = document.getElementById('wheel-round-display'); const wheelDecisionControls = document.getElementById('wheel-decision-controls'); const cashOutButton = document.getElementById('cash-out-button'); const nextRoundButton = document.getElementById('next-round-button'); const themeToggleButton = document.getElementById('theme-toggle-button'); const themePicker = document.getElementById('theme-picker');
+        const infoBar = document.getElementById('info-bar'); const hintDisplayArea = document.getElementById('hint-display-area'); const idleMessageContainer = document.getElementById('idle-message-container'); const hintControls = document.getElementById('hint-controls');
+        const wheelAlphabetPanel = document.getElementById('wheel-alphabet-panel');
+        const wheelHelpButton = document.getElementById('wheel-help-button');
+        const cardGameOverlay = document.getElementById('card-game-overlay');
+        const cardBoard = document.getElementById('card-board');
+        const cardGameMessage = document.getElementById('card-game-message');
+        const collectWinningsButton = document.getElementById('collect-winnings-button');
+        const cardPrizesList = document.getElementById('card-prizes-list');
+        const rulesButton = document.getElementById('rules-button');
+        const bonusActivationContainer = document.getElementById('bonus-activation-container');
+        const activeBonusDisplay = document.getElementById('active-bonus-display');
+        
+        // Napi Lottó elemek
+        const dailyLottoContainer = document.getElementById('lotto-container');
+        const playLottoButton = document.getElementById('play-lotto-button');
+        const dailyLottoSubmittedTicketsContainer = dailyLottoContainer.querySelector('.submitted-tickets-container');
+        const dailyLottoPlayedMessage = dailyLottoContainer.querySelector('.lotto-played-message');
+        const dailyLottoSuspensionMessage = dailyLottoContainer.querySelector('.lotto-suspension-message');
+        const winningLottoNumbersContainer = document.querySelector('#daily-winning-numbers-display');
+
+        // Heti Lottó elemek
+        const weeklyLottoContainer = document.getElementById('weekly-lotto-container');
+        const playWeeklyLottoButton = document.getElementById('play-weekly-lotto-button');
+        const weeklyLottoSubmittedTicketsContainer = weeklyLottoContainer.querySelector('.submitted-tickets-container');
+        const weeklyLottoPlayedMessage = weeklyLottoContainer.querySelector('.lotto-played-message');
+        const weeklyLottoSuspensionMessage = weeklyLottoContainer.querySelector('.lotto-suspension-message');
+        const weeklyWinningLottoNumbersContainer = document.querySelector('#weekly-winning-numbers-display');
+        
+        const lottoGameOverlay = document.getElementById('lotto-game-overlay');
+        const prizeChoiceOverlay = document.getElementById('prize-choice-overlay');
+        const lottoGridOverlay = document.getElementById('lotto-grid-overlay');
+        const lottoSelectionCounter = document.getElementById('lotto-selection-counter');
+        const submitLottoButtonOverlay = document.getElementById('submit-lotto-button-overlay');
+        const lottoOverlayMessage = document.getElementById('lotto-overlay-message');
+        const closeLottoOverlayButton = document.getElementById('close-lotto-overlay-button');
+        const lottoOverlayTitle = document.getElementById('lotto-overlay-title');
+        
+        const hourChoiceOverlay = document.getElementById('hour-choice-overlay');
+        
+        let selectedLottoNumbers = [];
+        let currentLottoType = 'daily'; // 'daily' or 'weekly'
+        let activeBonusInterval;
+        
+        const themes = [ { name: "Klasszikus", className: "theme-classic", color: "#3d405b" }, { name: "Erdei", className: "theme-forest", color: "#2d6a4f" }, { name: "Óceán", className: "theme-ocean", color: "#0077b6" }, { name: "Naplemente", className: "theme-sunset", color: "#f77f00" }, { name: "Éjszakai", className: "theme-night", color: "#232526" }, { name: "Rózsa", className: "theme-rose", color: "#c9184a" }, { name: "Vintage", className: "theme-vintage", color: "#a27b5c" }, { name: "Rét", className: "theme-meadow", color: "#7cb518" }, { name: "Királyi", className: "theme-royal", color: "#5a189a" }, { name: "Hacker", className: "theme-hacker", color: "#00ff00" } ];
+        const KEY_LAYOUT = [ 
+            ['Q', 'W', 'E', 'R', 'T', 'Z', 'U', 'I', 'O', 'P', 'Ő', 'Ú'],
+            ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'É', 'Á', 'Ű'],
+            ['Í', 'Y', 'X', 'C', 'V', 'B', 'N', 'M', 'Ö', 'Ü', 'Ó'],
+            ['Enter', 'Backspace']
+        ];
+        
+        const wheelSegmentsR1 = [ { label: '250', value: 250, color: '#a5d6a7' }, { label: 'CSŐD', value: 'bankrupt', color: 'var(--fail-color)' }, { label: '500', value: 500, color: '#b39ddb' }, { label: 'ÚJRA!', value: 'spin_again', color: '#ffeb3b' }, { label: 'FELEZŐ', value: 'halver', color: '#ff7043' }, { label: '750', value: 750, color: '#f2cc8f' }, { label: 'BIZTOSÍTÁS', value: 'insurance', color: 'var(--insurance-color)' }, { label: '1000', value: 1000, color: '#81b29a' }, { label: '+1 BETŰ', value: 'reveal_letter', color: '#4dd0e1' }, { label: '2000', value: 2000, color: '#e07a5f' }];
+        const wheelSegmentsR2 = [ { label: '1000', value: 1000, color: '#a5d6a7' }, { label: 'CSŐD', value: 'bankrupt', color: 'var(--fail-color)' }, { label: '1500', value: 1500, color: '#b39ddb' }, { label: '1 ÓRA TIPP', value: 'timed_free_hints', color: '#673ab7' }, { label: '2500', value: 2500, color: '#f2cc8f' }, { label: 'BIZTOSÍTÁS', value: 'insurance', color: 'var(--insurance-color)' }, { label: '3000', value: 3000, color: '#81b29a' }, { label: 'DUPLÁZÓ', value: 'double', color: '#ff9800' }, { label: '5000', value: 5000, color: '#e07a5f' }];
+        const wheelSegmentsR3 = [ { label: '5000', value: 5000, color: '#a5d6a7' }, { label: 'CSŐD', value: 'bankrupt', color: 'var(--fail-color)' }, { label: '10000', value: 10000, color: '#f2cc8f' }, { label: 'BIZTOSÍTÁS', value: 'insurance', color: 'var(--insurance-color)' }, { label: '25000', value: 25000, color: '#81b29a' }, { label: 'JACKPOT', value: 'jackpot', color: '#fbc02d' }, { label: 'KÁRTYAHÚZÁS', value: 'card_draw', color: '#673ab7' }, { label: 'DUPLÁZÓ', value: 'double', color: '#ff9800' }, { label: 'TOTAL CSŐD', value: 'total_bankrupt', color: '#000000' }, { label: '50000', value: 50000, color: '#e07a5f' }];
+        const wheelSegmentSets = [null, wheelSegmentsR1, wheelSegmentsR2, wheelSegmentsR3];
+        let wheelState = {};
+        const FULL_ALPHABET = "AÁBCDEÉFGHIÍJKLMNOÓÖŐPQRSTUÚÜŰVXYZ";
+        const VOWELS = "AÁEÉIÍOÓÖŐUÚÜŰ";
+        
+        const DAILY_LOTTO_PRIZES_META = {
+            1: { title: "1 Találat", desc: "+1 ingyen szöveges segítség", prize: { type: 'free_hint', count: 1 } },
+            2: { title: "2 Találat", desc: "Aznapra +2 vásárolható biztosítás a keréken", prize: { type: 'increased_insurance_limit' } },
+            3: { title: "3 Találat", desc: "ÓRA HATALMA: Aktiválható 1 órás ingyenes segítség", prize: { type: 'timed_free_hints', duration_ms: 1 * 60 * 60 * 1000, name: '1 Órás Ingyenes Segítség' } },
+            4: { title: "4 Találat", desc: "KERÉKMESTER: Aktiválható 3 órás ingyenes Szerencsekerék", prize: { type: 'timed_free_wheel', duration_ms: 3 * 60 * 60 * 1000, name: '3 Órás Ingyenes Kerék' } },
+            5: { title: "5 Találat", desc: "NYOMOZÓ SUPREME: Aktiválható 24 órás korlátlanság és +50,000 pont!", prize: { type: 'timed_god_mode', duration_ms: 24 * 60 * 60 * 1000, points: 50000, name: '24 Órás Korlátlanság' } }
+        };
+
+        const WEEKLY_LOTTO_PRIZES_META = {
+            1: { title: "1 Találat", desc: "+200,000 pont" },
+            2: { title: "2 Találat", desc: "+1,000,000 pont és +10 Biztosítás" },
+            3: { title: "3 Találat", desc: "+5,000,000 pont és HETI JOKER (köv. héten minden féláron)" },
+            4: { title: "4 Találat", desc: "+25,000,000 pont és ÖRÖK BÓNUSZ (+1 bizt./hét)" },
+            5: { title: "5 Találat", desc: "JACKPOT: 100,000,000 pont és a köv. heti összes napi lottó nyeremény!" }
+        };
+
+        const FUNNY_IDLE_MESSAGES = [ { title: "Türelmi idő", text: "Az informátorunk a következő órában jelentkezik újabb nyomokkal. Addig is..." }, { title: "Kávészünet a rendőrsön", text: "Még a legjobb nyomozóknak is jár egy fánk. Amíg eszel, a laborosok elemzik a bizonyítékokat. A következő adag..." }, { title: "Várakozás a sötét sikátorban", text: "Árnyékba húzódtál, és a kapcsolatodra vársz. Azt súgta, a következő füles..." }, { title: "Akták rendezése", text: "Annyi ügyet megoldottál, hogy a főnök megkért, rakj rendet az irodádban. A papírmunka a legkeményebb dió. Új ügyek..." }, ];
+        const RANDOM_GAME_MESSAGES = [
+            "Ez az ügy keményebb, mint a kétnapos zsemle.", "Minden betű egy újabb nyom.", "A megérzésem azt súgja, jó úton jársz.",
+            "Lassan összeáll a kép, mint egy puzzle.", "Csak egy hajszál választ el a megoldástól.", "Figyelj a részletekre, a tettes hibázni fog!",
+            "Ezt a rejtélyt még Columbo is megirigyelné.", "Már majdnem forró a nyom...", "A logika a legjobb fegyvered.",
+            "Minden tipp egy lépés a megoldás felé.", "Néha a legkézenfekvőbb megoldás a helyes.", "Van egy gyanúsítottam: az 'X' betű.",
+            "A helyszínelők mindjárt itt vannak a segítséggel.", "Bízz a megérzéseidben, nyomozó!", "Ennek a szónak alibije van?",
+            "Nézzük át újra a bizonyítékokat (betűket)!"
+        ];
+        const WHEEL_MESSAGES = {
+            start_round: [ "Kezdődjön a kör!", "Új feladvány, új esély!", "Lássuk, mit tudsz!"],
+            power_up_prompt: [ "Állítsd be az erősséget, majd kattints újra!" ],
+            spin_prompt: [ "Pörgess egy nagyot!", "Jöhet a pörgetés!", "Sorsfordító pörgetés következik!"],
+            spin_result: [ "A kerék {value} ponton állt meg!", "A szerencse {value} pontot hozott!", "{value} a jutalmad!"],
+            guess_consonant: [ "Válassz egy mássalhangzót!", "Melyik mássalhangzóra tippelsz?", "Jöhet egy mássalhangzó!"],
+            guess_vowel: [ "Vásárolj magánhangzót {value} pontért!", "Melyik magánhangzóra esik a választásod?"],
+            correct_guess: [ "Ez telitalálat!", "Tökéletes tipp!", "Benne van!", "Eltaláltad!"],
+            wrong_guess: [ "Sajnos ez nincs benne.", "Ez a betű most nem segített.", "Rossz tipp, de ne add fel!"],
+            bankrupt_round_lost: [ "CSŐD! Elvesztetted a körben szerzett pontjaidat, de a téted biztonságban!", "A CSŐD elvitte a körös nyereményt! Folytathatod." ],
+            bankrupt_stake_lost: [ "Újra csőd! A játékodnak sajnos vége. Elvesztetted a tétet is.", "A második csőd végzetes volt. A tét elúszott." ],
+            total_bankrupt_lost: ["TOTÁL CSŐD! A legrosszabb rémálmod! Elveszett a körös nyeremény és a tét is!", "Ez fájt! A Totál Csőd mindent vitt!"],
+            bankrupt_immune: ["CSŐD! De szerencséd van, ma csődmentességet élvezel a lottónyereményednek köszönhetően!", "Megúsztad a csődöt a lottó segítségével!"],
+            insurance_win: [ "BIZTOSÍTÁS! Nyertél egy védelmet a csőd ellen!", "Szuper! Van egy biztosításod!"],
+            insurance_limit_reached: [ "Elérted az óránkénti biztosítás limidet!", "Ebben az órában már nem szerezhetsz többet." ],
+            insurance_used: [ "Felhasználtál egy biztosítást és megmenekültél a csődtől!", "A biztosítás megmentett, minden pontod biztonságban!"],
+            double: ["DUPLÁZÓ! A kör nyereményed megduplázódott!", "Fantasztikus, dupla pontszám a körben!"],
+            halver: ["FELEZŐ! Ó, ne! A kör nyereményed megfeleződött.", "A Felező lecsapott, a körös pontjaid fele elszállt."],
+            spin_again: ["ÚJRA! Kaptál egy ingyen pörgetést!", "A kerék megkegyelmezett, pörgess újra!"],
+            reveal_letter: ["+1 BETŰ! Felfedek neked egy betűt a táblán.", "Ajándék betű érkezett!"],
+            jackpot: ["JACKPOT! Gratulálunk, bezsebelted a főnyereményt: 20,000 pont!", "Hihetetlen! Tiéd a Jackpot!"],
+            card_draw: ["KÁRTYAHÚZÁS! Húzhatsz egy lapot a 20 Kártya pakliból!", "Szerencsés vagy! Válassz egy bónusz kártyát!"],
+            solve_success: [ "Hihetetlen! Helyes a megfejtés!", "Gratulálunk, zseniális vagy!", "Megcsináltad! Tiéd a nyeremény!"],
+            solve_fail: [ "Sajnos ez nem a helyes megfejtés. A játék véget ért.", "Ez most nem jött össze. A helyes megfejtés: <strong>{solution}</strong>. Elbuktad a tétet.", "Rossz válasz. A megoldás: <strong>{solution}</strong>. A nyeremény elszállt."],
+            cash_out: [ "Okos döntés! A nyeremény a zsebedben.", "Gratulálunk a nyereményedhez!", "Szép volt!"],
+            next_round: [ "Jöhet a következő, nehezebb kör!", "A java még csak most jön!", "Készülj a következő körre!"],
+            not_enough_points: [ "Nincs elég pontod magánhangzót venni!", "Ehhez több pontra lesz szükséged!"],
+            no_more_consonants: ["Nincs több mássalhangzó a feladványban! Megpróbálhatod megfejteni, vagy vehetsz magánhangzót."],
+            must_guess_consonant: ["Pörgetés után mássalhangzót kell mondanod!", "Előbb tippelj, aztán pörgess újra!"]
+        };
+        const CARD_DATA = [
+            { type: 'total_bankrupt', label: 'Totál Csőd', description: 'Minden heti pontod elveszik!', cssClass: 'total-bankrupt' },
+            { type: 'half', label: 'Felező', description: 'A bónusz nyereményed feleződik.' },
+            { type: 'add_points', value: 10000, label: '+10000 Pont', description: 'Nyereményed jelentősen nő.' },
+            { type: 'boss_gift', value: 2500, label: 'A Főnök Ajándéka', description: 'Azonnali 2500 pont jutalom!', cssClass: 'special-prize' },
+            { type: 'add_insurance', label: '+1 Biztosítás', description: 'Kapsz egy biztosítást a Szerencsekerékhez.', cssClass: 'special-prize' },
+            { type: 'free_hint', label: 'Ingyen Tipp', description: 'Kapsz egy ingyenes szöveges tippet az alapjátékhoz.', cssClass: 'special-prize' },
+            { type: 'free_vowel', label: 'Ingyen Magánhangzó', description: 'Kapsz egy ingyen magánhangzót a Szerencsekerékhez.', cssClass: 'special-prize' },
+            { type: 'amnesty', label: 'Amnesztia', description: 'Törli egy rontott szó 15 perces várakozási idejét.', cssClass: 'special-prize' },
+            { type: 'point_rain', label: 'Pont Eső', description: 'Nyersz egy véletlenszerű összeget 1000 és 5000 pont között.' },
+            { type: 'witty_message', label: 'Robi Üzenete', description: '“A szerencse forgandó, de a tudás marad!”' },
+            { type: 'time_bonus', label: 'Időbónusz', description: '+60 mp az óra összes hátralévő időfutam feladványához.', cssClass: 'special-prize' },
+            { type: 'pick_again', label: 'Újra Választhatsz', description: 'Húzhatsz még egy kártyát.' },
+            { type: 'tripler', label: 'Pont Megtriplázó', description: 'A bónuszjátékból származó teljes nyereményed megháromszorozódik!', cssClass: 'joker' },
+            { type: 'double_or_nothing', label: 'Dupla vagy Semmi', description: 'Kockáztass! Vagy megduplázod a nyereményt, vagy mindent elveszítesz.', cssClass: 'joker' },
+            { type: 'pawn_shop', label: 'Zálogház', description: 'Eladhatsz egy biztosítást 3000 pontért cserébe.', cssClass: 'special-prize' },
+            { type: 'weekly_joker', label: 'Heti Joker', description: 'A hét végéig minden szöveges segítség 50% pontkedvezménnyel elérhető.', cssClass: 'joker' },
+            { type: 'code_breaker', label: 'Kódfejtő', description: 'Felfedünk egy számjegyet a Szerencsekerék mai titkos kódjából.', cssClass: 'special-prize' },
+            { type: 'theme_changer', label: 'Téma Váltó', description: 'A játék véletlenszerűen átvált egy másik színtémára.' },
+            { type: 'bad_joke', label: 'Rossz Tréfa', description: 'Levonunk 1000 pontot a nyereményedből. A nyomozás néha veszteséges.', cssClass: 'cursed' },
+            { type: 'cursed_card', label: 'Átkozott Kártya', description: 'Elveszítesz egy biztosítást. Óvatosan a bizonyítékokkal!', cssClass: 'cursed' }
+        ];
+
+        function initializeGame() {
+            // --- A JÁTÉK INICIALIZÁLÁSA ---
+            populateThemePicker();
+            loadTheme();
+            initGame();
+            setInterval(checkForNewHour, 1000 * 30);
+            setInterval(() => { 
+                const now = new Date();
+                const utcHour = now.getUTCHours();
+                const utcDay = now.getUTCDay();
+                if (utcHour >= 19 && gameData.lotto && !gameData.lotto.prizesEvaluated) {
+                    evaluateDailyLottoPrizes();
+                    updateMainDailyLottoView();
+                    updateMainWeeklyLottoView();
+                }
+                let stats = getWeeklyStats();
+                if (utcDay === 0 && utcHour >= 19 && stats.weeklyLotto && !stats.weeklyLotto.prizesEvaluated) {
+                    stats = evaluateWeeklyLottoPrizes(stats);
+                    saveWeeklyStats(stats);
+                    updateMainWeeklyLottoView();
+                }
+             }, 60000);
+             
+            // --- ESEMÉNYKEZELŐK ---
+            playLottoButton.addEventListener('click', () => openLottoOverlay('daily'));
+            playWeeklyLottoButton.addEventListener('click', () => openLottoOverlay('weekly'));
+            submitLottoButtonOverlay.addEventListener('click', submitLottoTicketOverlay);
+            playWheelButton.addEventListener('click', initWheelGame);
+            spinButton.addEventListener('click', togglePowerMeterAndSpin);
+            powerMeterContainer.addEventListener('click', togglePowerMeterAndSpin);
+            solveButton.addEventListener('click', solve);
+            cashOutButton.addEventListener('click', cashOut);
+            nextRoundButton.addEventListener('click', startNewRound);
+            closeWheelButton.addEventListener('click', () => { 
+                if(confirm("Biztosan feladod a játékot? Elveszíted a tétet és a nyereményeket!")){
+                    loseGame();
+                }
+            });
+            collectWinningsButton.addEventListener('click', () => {
+                cardGameOverlay.classList.remove('visible');
+                cashOut();
+            });
+            
+            requestTextHintButton.addEventListener('click', () => { if (spendPointsForHint(false)) displayHint(false); });
+            requestLetterHintButton.addEventListener('click', () => { if (spendPointsForHint(true)) displayHint(true); });
+
+            rulesButton.addEventListener('click', openRulesWindow);
+            newHourNotification.querySelector('button').addEventListener('click', () => location.reload());
+            checkCodeButton.addEventListener('click', () => {
+                const enteredCode = Array.from(codeInputs).map(input => input.value).join('');
+                const correctCode = gameData.secretCode.join('');
+                if (enteredCode === correctCode) {
+                    gameData.bonusUnlocked = true;
+                    saveGame();
+                    updateBonusUnlockUI();
+                    alert('Sikeres kód! A Szerencsekerék feloldva!');
+                    bonusUnlockContainer.style.display = 'none';
+                } else {
+                    codeInputContainer.classList.add('shake');
+                    setTimeout(() => codeInputContainer.classList.remove('shake'), 500);
+                    alert('Hibás kód!');
+                }
+            });
+             codeInputs.forEach(input => {
+                input.addEventListener('input', () => {
+                    if (input.value.length >= 1) {
+                        const nextIndex = parseInt(input.dataset.index) + 1;
+                        if (nextIndex < codeInputs.length) {
+                            codeInputs[nextIndex].focus();
+                        }
+                    }
+                });
+            });
+
+            // --- BILLENTYŰZET KEZELÉS ---
+            document.addEventListener('keydown', (e) => {
+                const activeElement = document.activeElement;
+                const isOverlayVisible = document.querySelector('.overlay.visible');
+                
+                if (isOverlayVisible || (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA'))) {
+                    return;
+                }
+                
+                if (e.ctrlKey || e.metaKey || e.altKey || e.key.startsWith('F')) {
+                    return;
+                }
+
+                if (e.key === 'Backspace' || e.key === 'Enter' || (e.key.length === 1 && e.key.match(/[a-z-A-Z-áéíóöőúüűÁÉÍÓÖŐÚÜŰ]/i))) {
+                     e.preventDefault();
+                }
+
+                if (!keyboardToggleCheckbox.checked) {
+                    const keyButton = document.querySelector(`.key[data-key="${e.key.toUpperCase()}"]`);
+                     if(keyButton) {
+                        keyButton.classList.add('active-press');
+                        setTimeout(() => keyButton.classList.remove('active-press'), 150);
+                     }
+                }
+                
+                handleKeyPress(e.key);
+            });
+        }
+        
+        // --- A JÁTÉKLOGIKA TÖBBI RÉSZE ITT KEZDŐDIK ---
+        // (A függvények, amik a fentebb definiált változókat használják)
+        // ... (Ide jön a teljes kód a `populateThemePicker` függvénytől kezdve egészen a `handleKeyPress` és az utolsó `});` végéig.)
+    
+    });
+    </script>
+</body>
+</html>
